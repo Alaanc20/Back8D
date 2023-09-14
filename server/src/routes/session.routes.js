@@ -1,32 +1,34 @@
 import { Router } from 'express';
-import SessionManager from '../services/db/session.service.js';
+import passport from 'passport';
 
 const router = Router();
-const manager = new SessionManager();
 
-router.post("/register", async (req, res) => {
-    const { first_name, last_name, email, age, password } = req.body;
-    try {
-        let result = await manager.register(first_name, last_name, email, age, password);
-        res.status(result.code).json({message: result.status})
-    } catch (error) {
-        res.status(500).json({ error: `Ocurrió un error en el servidor: ${error}` });
-    }
+router.get("/github", passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => { });
+
+router.get("/githubcallback", passport.authenticate('github', { failureRedirect: '/github/error' }), async (req, res) => {
+    const user = req.user;
+    req.session.user = {
+        name: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+        age: user.age
+    };
+    req.session.admin = true;
+    res.redirect('http://localhost:3000/products');
 });
 
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        let result = await manager.login(email, password);
-        let payload;
-        if (result.code === 200) {
-            req.session.user = result.sessionUser;
-            payload = req.session;
-        }
-        res.status(result.code).json({status: result.status, payload})
-    } catch (error) {
-        res.status(500).json({ error: `Ocurrió un error en el servidor: ${error}` });
+router.post("/register", passport.authenticate('register', { failureRedirect: '/api/sessions/fail-register' }), async (req, res) => {
+    res.status(201).send({ status: "success", message: "Usuario creado con extito." })
+});
+
+router.post("/login", passport.authenticate('login', { failureRedirect: '/api/sessions/fail-register' }), async (req, res) => {
+    const user = req.user;
+    if (!user) return res.status(401).send({ status: "error", error: "credenciales incorrectas" });
+    req.session.user = {
+        name: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+        age: user.age
     }
+    res.send({ status: "success", payload: req.session.user, message: "logueo realizado" });
 });
 
 router.get("/logout", (req, res) => {
@@ -44,6 +46,14 @@ router.get("/current", (req, res) => {
     } else {
       res.status(401).json({ error: 'No hay sesión activa' });
     }
+});
+
+router.get("/fail-register", (req, res) => {
+    res.status(401).send({ error: "Failed to process register!" });
+});
+
+router.get("/fail-login", (req, res) => {
+    res.status(401).send({ error: "Failed to process login!" });
 });
 
 export default router;

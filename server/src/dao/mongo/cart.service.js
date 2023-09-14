@@ -1,4 +1,4 @@
-import { MODEL_CARTS } from "./models/cart.js";
+import { MODEL_CARTS } from "../../models/cart.model.js";
 
 export default class CartManager {
 

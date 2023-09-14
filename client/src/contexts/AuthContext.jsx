@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axiosInstance.post('/api/sessions/login', { email, password });
 
+      console.log(response.data)
       if (response.status === 200) {
-        setUser(response.data.payload.user);
+        
+        setUser(response.data.payload);
       }
     } catch (error) {
       console.error('Error de inicio de sesión:', error);

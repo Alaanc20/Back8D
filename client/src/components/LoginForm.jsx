@@ -11,6 +11,11 @@ const LoginForm = () => {
       login(email, password);
     };
 
+    const handleGitHubLogin = async (e) => {
+      e.preventDefault();
+      window.location.href = 'http://localhost:8080/api/sessions/github';
+    }
+
     return <>
       <h1>Login</h1>
       <div>
@@ -34,6 +39,7 @@ const LoginForm = () => {
           <button type="submit">Iniciar Sesión</button>
         </form>
       </div>
+      <button onClick={handleGitHubLogin}>Logueate con github</button>
       <p>No tienes una cuenta?, <a href="/register">click aqui</a></p>
     </>
 }

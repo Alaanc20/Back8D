@@ -4,12 +4,12 @@ import express, { urlencoded } from "express";
 import router from "./routes/index.js";
 import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
-import handlebars from "express-handlebars";
-import __dirname from './utils.js';
 import http from 'http';
 import { Server } from "socket.io";
 import cors from 'cors';
 import session from 'express-session';
+import passport from 'passport';
+import initializePassport from './config/passport.config.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -30,12 +30,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(express.static(__dirname + '/public'));
-
-app.engine('handlebars', handlebars.engine());
-app.set('views', __dirname + '/views');
-app.set('view engine', 'handlebars');
-
 app.use(session({
 
     store: MongoStore.create({
@@ -48,6 +42,9 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+initializePassport();
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/', router);
 
