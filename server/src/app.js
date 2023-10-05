@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config()
 import express, { urlencoded } from "express";
 import router from "./routes/index.js";
 import mongoose from "mongoose";
@@ -10,13 +8,14 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import initializePassport from './config/passport.config.js';
+import envConfig from "./config/env.config.js";
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const PORT = process.env.PORT || 8080;
-const MONGO_URI = process.env.MONGO_URI;
-const SESSION_SECRET = process.env.SESSION_SECRET || "mir4l0k3s34v3c1n4al4vu3lt4d3l43skin4";
+const PORT = envConfig.port;
+const MONGO_URI = envConfig.mongoUri;
+const SESSION_SECRET = envConfig.sessionSecret;
 
 app.use(express.json());
 app.use(urlencoded({extended: true}));

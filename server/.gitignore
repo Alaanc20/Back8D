@@ -1,6 +1,5 @@
+
 /node_modules
-carrito.http
-products.http
 /.pnp
 .pnp.js
 /coverage
@@ -13,3 +12,4 @@ products.http
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.env*
