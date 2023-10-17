@@ -1,4 +1,5 @@
 import CartManager from "../dao/mongo/cart.service.js";
+import { generateUniqueTicketCode } from "../utils/generateCode.js";
 
 const manager = new CartManager();
 
@@ -70,5 +71,62 @@ export const cleanCartControllers = async (req, res) => {
         res.status(status.code).json({ status: status.status });
     } catch (error) {
         res.status(500).json({ error: `Ocurrió un error en el servidor: ${error}` });
+    }
+};
+
+export const purchaseCartControllers = async (req, res) => {
+    const { cid } = req.params;
+
+    try {
+        const cart = await manager.getCartById(cid);
+
+        if (!cart) {
+            return res.status(404).json({ error: "Carrito no encontrado" });
+        }
+
+        const productsToUpdate = [];
+        const productsToKeep = [];
+
+        for (const item of cart.products) {
+            const product = item.product;
+            const quantityInCart = item.quantity;
+
+            if (product.stock >= quantityInCart) {
+                product.stock -= quantityInCart;
+                productsToUpdate.push(product);
+            } else {
+                productsToKeep.push(item);
+            }
+        }
+
+        await Promise.all(productsToUpdate.map((product) => manager.updateProduct(product._id, product)));
+
+        await manager.updateCart(cid, productsToKeep);
+
+        const totalAmount = productsToUpdate.reduce((total, product) => {
+            const quantityInCart = cart.products.find(item => item.product.equals(product._id)).quantity;
+            const productPrice = product.price;
+            return total + productPrice * quantityInCart;
+        }, 0);
+
+        const ticket = {
+            code: generateUniqueTicketCode(),
+            purchase_datetime: new Date(),
+            amount: totalAmount,
+            purchaser: req.session.email || 'anon',
+        };
+
+        const createdTicket = await manager.createTicket(ticket);
+
+        const productsNotPurchased = productsToKeep.map(item => item.product);
+
+        return res.status(200).json({
+            message: "Compra exitosa",
+            ticket: createdTicket,
+            productsNotPurchased: productsNotPurchased,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Ocurrió un error en el servidor" });
     }
 };

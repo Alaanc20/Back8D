@@ -1,6 +1,5 @@
 import express, { urlencoded } from "express";
 import router from "./routes/index.js";
-import mongoose from "mongoose";
 import MongoStore from "connect-mongo";
 import http from 'http';
 import { Server } from "socket.io";
@@ -9,6 +8,7 @@ import session from 'express-session';
 import passport from 'passport';
 import initializePassport from './config/passport.config.js';
 import envConfig from "./config/env.config.js";
+import MongoSingleton from "./config/mongodb-singleton.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -64,8 +64,7 @@ export function getIO() {
 
 const connectMongoDB = async () => {
     try {
-        await mongoose.connect(MONGO_URI);
-        console.log("Conectado con exito a MongoDB usando Moongose.");
+        await MongoSingleton.getIntance()
     } catch (error) {
         console.error("No se pudo conectar a la BD usando Moongose: " + error);
         process.exit();

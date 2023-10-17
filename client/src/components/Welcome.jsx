@@ -12,7 +12,11 @@ const Welcome = ({ user }) => {
   return (
     <div className="welcome-products-user">
       <h2>Bienvenido {user?.name}</h2>
-      <button onClick={handleLogout}>Logout</button>
+      <div>
+        {user?.admin ? <button>Admin Menu</button> : null}
+        <button>Ver Perfil</button>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
     </div>
   );
 };

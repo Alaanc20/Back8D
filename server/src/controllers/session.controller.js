@@ -10,7 +10,7 @@ export const githubCallbackControllers = async (req, res) => {
 };
 
 export const registerControllers = async (req, res) => {
-    res.status(201).send({ status: "success", message: "Usuario creado con extito." })
+    res.status(201).send({ status: "success", message: "Usuario creado." })
 };
 
 export const loginControllers = async (req, res) => {
@@ -19,9 +19,10 @@ export const loginControllers = async (req, res) => {
     req.session.user = {
         name: `${user.first_name} ${user.last_name}`,
         email: user.email,
-        age: user.age
+        age: user.age,
+        admin: user.role === 'admin'
     }
-    res.send({ status: "success", payload: req.session.user, message: "logueo realizado" });
+    res.send({ status: "success", payload: req.session.user, message: "logueo" });
 };
 
 export const logoutControllers = (req, res) => {
@@ -29,7 +30,7 @@ export const logoutControllers = (req, res) => {
         if (error){
             res.status(400).json({error: "error logout", mensaje: "Error al cerrar la sesion"});
         }
-        res.status(200).json({message: "Sesion cerrada correctamente."});
+        res.status(200).json({message: "Sesion cerrada."});
     });
 };
 
@@ -42,9 +43,9 @@ export const checkSessionControllers = (req, res) => {
 };
 
 export const failRegisterControllers = (req, res) => {
-    res.status(401).send({ error: "Failed to process register!" });
+    res.status(401).send({ error: "Error al procesar el registro!" });
 };
 
 export const failLoginControllers = (req, res) => {
-    res.status(401).send({ error: "Failed to process login!" });
+    res.status(401).send({ error: "Error al procesar el registro!" });
 };

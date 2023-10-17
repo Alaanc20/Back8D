@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await axiosInstance.get('/api/sessions/current');
         if (response.status === 200) {
+          console.log(response.data.user)
           setUser(response.data.user);
         }
       } catch (error) {

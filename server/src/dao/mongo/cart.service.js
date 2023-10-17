@@ -1,4 +1,6 @@
 import { MODEL_CARTS } from "../../models/cart.model.js";
+import { MODEL_PRODUCTS } from "../../models/product.model.js";
+import { MODEL_TICKETS } from "../../models/ticket.model.js";
 
 export default class CartManager {
 
@@ -38,7 +40,7 @@ export default class CartManager {
             if (!cart) {
                 return { code: 404, status: 'carrito no encontrado' };
             }
-            const productExist = cart.products.find(product => product.product === pid);
+            const productExist = cart.products.find(product => product.product.equals(pid));
             if (productExist) {
                 productExist.quantity += 1;
             } else {
@@ -109,6 +111,38 @@ export default class CartManager {
             return { code: 404, status: 'Carrito no encontrado' };
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async getCartById(cid) {
+        try {
+            const cart = await MODEL_CARTS.findById(cid).populate('products.product');
+            return cart;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async updateProduct(productId, productData) {
+        console.log(productData)
+        try {
+            const result = await MODEL_PRODUCTS.updateOne({ _id: productId }, { $set: { stock: productData.stock } });
+            if (result.acknowledged === true) {
+                return { code: 200, status: 'Producto actualizado en el carrito' };
+            }
+            return { code: 404, status: 'Producto no encontrado en el carrito' };
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async createTicket(ticketData) {
+        try {
+            const result = await MODEL_TICKETS.create(ticketData);
+            return { code: 200, status: 'Ticket creado', ticket: result };
+        } catch (error) {
+            console.log(error);
+            return { code: 500, status: 'Ocurrió un error al crear el ticket' };
         }
     }
 }

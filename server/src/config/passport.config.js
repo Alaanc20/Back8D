@@ -106,7 +106,7 @@ const initializePassport = () => {
             let user = await MODEL_USER.findById(id);
             done(null, user);
         } catch (error) {
-            console.error("Error deserializando el usuario: " + error);
+            console.error("Error de usuario: " + error);
         }
     });
 

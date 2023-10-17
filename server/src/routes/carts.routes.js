@@ -6,24 +6,28 @@ import {
     updateCartControllers, 
     updateProductQuantityControllers, 
     removeProductFromCartControllers, 
-    cleanCartControllers
+    cleanCartControllers,
+    purchaseCartControllers
 } from '../controllers/carts.controller.js';
+import { authUser } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 
 router.get('/:cid', getCartControllers);
 
-router.post('/', createCartControllers);
+router.post('/', authUser, createCartControllers);
 
-router.post('/:cid/product/:pid', addProductToCartControllers);
+router.post('/:cid/product/:pid', authUser, addProductToCartControllers);
 
-router.put('/:cid', updateCartControllers);
+router.post("/:cid/purchase", authUser, purchaseCartControllers);
 
-router.put('/:cid/product/:pid', updateProductQuantityControllers);
+router.put('/:cid', authUser, updateCartControllers);
+
+router.put('/:cid/product/:pid', authUser, updateProductQuantityControllers);
 
 router.delete('/:cid/product/:pid', removeProductFromCartControllers);
 
-router.delete('/:cid', cleanCartControllers);
+router.delete('/:cid', authUser, cleanCartControllers);
 
 export default router;
