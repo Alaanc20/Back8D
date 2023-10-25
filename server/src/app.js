@@ -9,6 +9,7 @@ import passport from 'passport';
 import initializePassport from './config/passport.config.js';
 import envConfig from "./config/env.config.js";
 import MongoSingleton from "./config/mongodb-singleton.js";
+import compression from "express-compression";
 
 const app = express();
 const server = http.createServer(app);
@@ -44,6 +45,8 @@ app.use(session({
 initializePassport();
 app.use(passport.initialize())
 app.use(passport.session())
+
+app.use(compression());
 
 app.use('/', router);
 
