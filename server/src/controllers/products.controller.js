@@ -80,7 +80,7 @@ export const getProductByIdControllers = async (req, res) => {
             })
         }
     } catch (error) {
-        console.error(error);
+        req.logger.error(error);
         res.status(404).json({error: error.code, message: error.message});
     }
 

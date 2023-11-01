@@ -21,7 +21,7 @@ export const getCartControllers = async (req, res) => {
             })
           }
     } catch (error) {
-        console.error(error);
+        req.logger.error(error);
         res.status(404).json({error: error.code, message: error.message});
     }
    
@@ -141,7 +141,7 @@ export const purchaseCartControllers = async (req, res) => {
             productsNotPurchased: productsNotPurchased,
         });
     } catch (error) {
-        console.error(error);
+        req.logger.error(error);
         return res.status(500).json({ error: "Ocurrió un error en el servidor" });
     }
 };
